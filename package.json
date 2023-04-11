@@ -57,7 +57,7 @@
     "pubnub": "4.37.0",
     "query-string": "4.3.4",
     "react": "17.0.2",
-    "react-native": "0.66.4",
+    "react-native": "0.66.5",
     "react-native-actionsheet": "git+ssh://git@github.com/ServiceMax-Engineering/react-native-actionsheet.git#GO-18928-on-2.3.0svmx",
     "react-native-animatable": "1.2.4",
     "react-native-background-timer": "git+ssh://git@github.com/ServiceMax-Engineering/react-native-background-timer.git",
