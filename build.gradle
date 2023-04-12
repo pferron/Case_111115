@@ -1,0 +1,104 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext {
+        buildToolsVersion = "31.0.0"
+        minSdkVersion = 23
+        compileSdkVersion = 31
+        targetSdkVersion = 31
+        ndkVersion = "21.4.7075529"
+        supportLibVersion = "31.0.0"
+        googlePlayServicesVersion = "17.0.0"
+        googlePlayServicesMapsVersion = "17.0.0"
+        googlePlayServicesVisionVersion = "17.0.2"
+        googlePlayServicesLocationVersion = "17.0.0"
+        firebaseMessagingVersion = "21.1.0"
+        kotlin_version = "1.6.0"
+    }
+    repositories {
+        google()
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+        mavenCentral()
+        jcenter()
+        maven { url "https://jitpack.io" }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.0.4'
+        classpath 'com.google.gms:google-services:4.3.3'
+        classpath "com.newrelic.agent.android:agent-gradle-plugin:6.4.0"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+def REACT_NATIVE_VERSION = new File(['node', '--print',"JSON.parse(require('fs').readFileSync(require.resolve('react-native/package.json'), 'utf-8')).version"].execute(null, rootDir).text.trim())
+
+allprojects {
+    repositories {
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url("$rootDir/../node_modules/react-native/android")
+        }
+        maven {
+            // Android JSC is installed from npm
+            url("$rootDir/../node_modules/jsc-android/dist")
+        }
+        mavenCentral {
+            // We don't want to fetch react-native from Maven Central as there are
+            // older versions over there.
+            content {
+                excludeGroup "com.facebook.react"
+            }
+        }
+        google()
+        maven { url 'https://www.jitpack.io' }
+        // Deprecated, slated for shutdown but required for the react-native-video lib to work
+        jcenter()
+    }
+}
+
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            android {
+                buildToolsVersion rootProject.ext.buildToolsVersion
+                compileSdkVersion rootProject.ext.compileSdkVersion
+                defaultConfig {
+                    targetSdkVersion rootProject.ext.targetSdkVersion
+                }
+                buildTypes {
+                    release {
+                    }
+                    stagingRelease {
+                    }
+                    productionRelease {
+                    }
+                    privateRelease {
+                    }
+                    emmRelease {
+                    }
+                    previewrelease {
+                    }
+                }
+            }
+        }
+    }
+
+    project.configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'com.android.support'
+                    && !details.requested.name.contains('multidex')) {
+                details.useVersion rootProject.ext.supportLibVersion
+            }
+        }
+        // Required to run in x86_64 emulator
+        resolutionStrategy {
+            force "com.facebook.soloader:soloader:0.10.3"
+            force "com.facebook.react:react-native:" + REACT_NATIVE_VERSION
+        }
+    }
+}
